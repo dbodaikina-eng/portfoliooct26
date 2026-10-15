@@ -27,38 +27,121 @@ body{margin:0}
   .case-first { order: -1; }
   .case-rest { order: 1; }
 }
+
+/* ===== v2 effects ===== */
+/* O window in SOLVING */
+.o-win{position:relative;display:inline-block;isolation:isolate}
+.o-win__pane{position:absolute;z-index:-1;left:.148em;top:.172em;width:.568em;height:.604em;border-radius:50%;overflow:hidden}
+.o-win__pane img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}
+.o-win__pane img.is-on{opacity:1}
+
+/* Card -> case morph (View Transitions) */
+::view-transition-group(case-media){animation-duration:.6s;animation-timing-function:cubic-bezier(.2,.7,.2,1)}
+::view-transition-old(case-media),::view-transition-new(case-media){height:100%;object-fit:cover}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.35s}
+
+/* Cursor label */
+.cur{position:fixed;left:0;top:0;z-index:300;pointer-events:none;padding:12px 18px;border-radius:999px;color:#1c1916;background:linear-gradient(180deg,rgba(255,255,255,.62),rgba(255,255,255,.28));-webkit-backdrop-filter:blur(14px) saturate(180%);backdrop-filter:blur(14px) saturate(180%);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 0 0 1px rgba(255,255,255,.45),0 0 0 1px rgba(28,25,22,.10),0 10px 28px rgba(28,25,22,.18);font:600 12px/1 'Sora',sans-serif;letter-spacing:.02em;text-transform:uppercase;white-space:nowrap;opacity:0;transform:translate(-50%,-50%) scale(.3);transition:opacity .2s,transform .3s cubic-bezier(.2,.7,.2,1);will-change:left,top}
+.cur.is-on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+@media (hover:hover) and (pointer:fine){[data-cursor],[data-cursor] *{cursor:none!important}}
+
+/* Experience: sticky title + timeline */
+@container (min-width: 761px){.exp-title{position:sticky;top:clamp(24px,3cqw,48px);align-self:flex-start}}
+.exp-list{position:relative;padding-left:clamp(20px,2cqw,32px)}
+.exp-list::before,.exp-fill{content:"";position:absolute;left:0;top:0;bottom:0;width:1px;background:#e6e3de}
+.exp-fill{height:100%;background:#e5866e;transform-origin:top;transform:scaleY(var(--p,0))}
+.exp-list>article{position:relative}
+.exp-list>article>h3{position:relative;will-change:transform}
+.exp-list>article>h3::before{content:"";position:absolute;box-sizing:border-box;left:calc(-1*clamp(20px,2cqw,32px) - 4px);top:calc(.625em - 4.5px);width:9px;height:9px;border-radius:50%;background:#fff;border:1px solid #c9c4bd;transition:background .3s,border-color .3s}
+.exp-list>article.is-past>h3::before{background:#e5866e;border-color:#e5866e}
+@container (min-width: 761px){
+  .exp-list>article{display:grid;grid-template-columns:minmax(0,19cqw) minmax(0,1fr);column-gap:clamp(24px,3cqw,48px);align-items:start}
+  .exp-list>article>p{margin-top:0!important}
+}
+
+/* Typewriter subtitle */
+.hero-sub.is-typing .tw{visibility:hidden}
+.hero-sub.is-typing .tw.on{visibility:visible}
+.tw-caret{display:inline-block;position:relative;width:0;height:1em;vertical-align:baseline}
+.tw-caret::after{content:"";position:absolute;left:.03em;bottom:-.05em;width:.07em;height:.84em;background:#e5866e}
+.tw-caret.is-idle::after{animation:twblink .9s steps(1) infinite}
+@keyframes twblink{50%{opacity:0}}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* First screen fits the viewport height: header space + hero + gap = ~88% of the screen, so the next row peeks in */
+.hero{padding-top:min(8.61cqw,13vh)!important;padding-top:min(8.61cqw,13svh)!important}
+.hero-stage{position:relative;container-type:inline-size;margin:0 auto;
+  width:min(100%,max(360px,calc((88vh - min(8.61cqw,13vh) - max(min(7.94cqw,6vh),56px)) / .512)));
+  width:min(100%,max(360px,calc((88svh - min(8.61cqw,13svh) - max(min(7.94cqw,6svh),56px)) / .512)))}
+
+/* Hero arts sit outside the subtitle on wide layouts: left art to the left, drawing + watch to the right */
+@container (min-width: 480px){
+  #hero-art-left{right:auto!important;left:5cqw!important}
+  #hero-art-right{left:min(81.5cqw, calc(100% - max(13.45cqw, min(20cqw, 90px)) - 8px))!important}
+  #hero-art-right2{left:min(87.5cqw, calc(100% - max(13.45cqw, min(20cqw, 90px)) * 0.9 - 8px))!important;top:calc(25.5cqw + 13.45cqw * 1.408 * 0.5)!important}
+}
+
+/* Experience key words */
+.exp-list .kw{font-weight:600;color:#1c1916;transition:background-size .8s cubic-bezier(.2,.7,.2,1) var(--kd,0s),background-position 1s cubic-bezier(.2,.7,.2,1) var(--kd,0s),color .6s ease var(--kd,0s),filter .7s ease var(--kd,0s)}
+.exp-list[data-kw="4"] .kw{background-image:linear-gradient(90deg,#1c1916 50%,#cfc9c1 50%);background-size:200% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.exp-list[data-kw="4"] .kw-on .kw{background-position:0 0}
+.exp-list.kw-reset .kw{transition:none!important}
+@media (prefers-reduced-motion: reduce){.exp-list .kw{transition:none!important}}
+
+/* Outcome numbers */
+.num{font-weight:600;color:#1c1916;font-variant-numeric:tabular-nums}
+
+/* Contact footer */
+.contact{margin:0 clamp(16px,1.587cqw,24px);padding:max(5.29cqw,48px) 0 max(5.29cqw,48px);border-top:1px solid #e6e3de;text-align:center}
+.contact-big{position:relative;margin:0;padding:0 .052em 0 0;font-size:11.2cqw;line-height:1;font-weight:400;letter-spacing:-.052em;text-transform:uppercase;white-space:nowrap}
+.contact-big .ch{display:inline-block;overflow:hidden;vertical-align:top;padding:.04em 0}
+.contact-big .ch>span{display:inline-block}
+.js .contact-big .ch>span{transform:translateY(110%);transition:transform .9s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
+.js .contact-big.is-in .ch>span{transform:none}
+.contact-row{position:relative;z-index:1;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(16px,2.6cqw,40px);margin-top:clamp(28px,3cqw,48px);font-size:clamp(12px,1.455cqw,22px);line-height:1;font-weight:600;text-transform:uppercase}
+.contact-btn,.contact-link{min-height:44px;display:inline-flex;align-items:center;padding:0;border:0;background:none;font:inherit;color:inherit;text-transform:inherit;text-decoration:none;cursor:pointer;background-image:linear-gradient(#e5866e,#e5866e);background-size:0 2px;background-repeat:no-repeat;background-position:0 calc(50% + .75em);transition:background-size .35s cubic-bezier(.2,.7,.2,1)}
+.contact-btn:hover,.contact-link:hover,.contact-btn:focus-visible,.contact-link:focus-visible{background-size:100% 2px}
+.contact-toast{position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);padding:8px 12px;border-radius:8px;background:#1c1916;color:#fff;font-size:12px;letter-spacing:.02em;opacity:0;transition:opacity .2s;pointer-events:none}
+.contact-toast.is-on{opacity:1}
+
+@media (prefers-reduced-motion: reduce){
+  ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}
+  .js .contact-big .ch>span{transform:none;transition:none}
+}
 </style>
 </head>
 <body>
 <div style="width: 100%; background: #ffffff; font-family: 'Sora', sans-serif; color: #1c1916; -webkit-font-smoothing: antialiased">
-<div id="page-wrap" style="position: relative; max-width: 1512px; margin: 0 auto; container-type: inline-size; overflow: hidden">
+<div id="page-wrap" style="position: relative; max-width: 1512px; margin: 0 auto; container-type: inline-size; overflow: hidden; overflow: clip">
 
-<section style="position: relative; padding: 8.61cqw 0 0 0; text-align: center">
+<section class="hero" style="position: relative; padding: 8.61cqw 0 0 0; text-align: center">
 <div style="position: absolute; top: clamp(12px, 2.05cqw, 31px); left: clamp(16px, 2.646cqw, 40px); right: clamp(16px, 2.646cqw, 40px); z-index: 3; display: flex; justify-content: space-between; align-items: center; font-size: clamp(12px, 1.455cqw, 22px); line-height: 1; font-weight: 600; text-transform: uppercase">
 <span>Daria Bodaikina</span>
 <span>Senior product designer</span>
 </div>
-<h1 style="position: relative; z-index: 2; margin: 0; padding: 0 0.052em 0 0; font-size: 17.06cqw; line-height: 1; font-weight: 400; letter-spacing: -0.052em; text-transform: uppercase; white-space: nowrap">SOLVING</h1>
+<div class="hero-stage">
+<h1 style="position: relative; z-index: 2; margin: 0; padding: 0 0.052em 0 0; font-size: 17.06cqw; line-height: 1; font-weight: 400; letter-spacing: -0.052em; text-transform: uppercase; white-space: nowrap" aria-label="Solving">S<span class="o-win" aria-hidden="true">O<span class="o-win__pane"><img src="assets/art-still-life.jpg" alt="" decoding="async"><img src="assets/work-fintech.jpg" alt="" decoding="async"><img src="assets/art-figure-drawing.jpg" alt="" decoding="async"><img src="assets/work-payment-system.webp" alt="" decoding="async"><img src="assets/hero-daria-sitting-light.jpg" alt="" decoding="async"></span></span><span aria-hidden="true">LVING</span></h1>
 <img src="assets/hero-daria-sitting-light.jpg" alt="Black-and-white photo of Daria Bodaikina sitting cross-legged on a studio floor" style="position: relative; z-index: 1; display: block; width: max(28.7cqw, min(50cqw, 240px)); aspect-ratio: 434 / 522; margin: -9.93cqw auto 0 auto; object-fit: cover; opacity: 0.5">
 <img id="hero-art-left" src="assets/art-still-life.jpg" alt="" aria-hidden="true" style="position: absolute; z-index: 1; width: max(13.45cqw, min(20cqw, 90px)); aspect-ratio: 1278 / 1800; object-fit: cover; pointer-events: none; opacity: 0; top: 23.5cqw; right: calc(50% + max(28.7cqw, min(50cqw, 240px)) / 2 + 2cqw); filter: saturate(0.55) contrast(0.92) brightness(1.06)">
 <img id="hero-art-right" src="assets/art-figure-drawing.jpg" alt="" aria-hidden="true" style="position: absolute; z-index: 1; width: max(13.45cqw, min(20cqw, 90px)); aspect-ratio: 1278 / 1800; object-fit: cover; pointer-events: none; opacity: 0; top: 25.5cqw; left: calc(50% + max(28.7cqw, min(50cqw, 240px)) / 2 + 2cqw); filter: grayscale(1) contrast(1.4) brightness(1.04)">
 <img id="hero-art-right2" src="assets/art-goals-watch.webp" alt="" aria-hidden="true" style="position: absolute; z-index: 1; width: calc(max(13.45cqw, min(20cqw, 90px)) * 0.72); aspect-ratio: 1701 / 2236; pointer-events: none; opacity: 0; top: calc(25.5cqw + max(13.45cqw, min(20cqw, 90px)) * 1.408 * 0.3); left: min(50% + max(28.7cqw, min(50cqw, 240px)) / 2 + 2cqw + max(13.45cqw, min(20cqw, 90px)) * 0.78, 100% - max(13.45cqw, min(20cqw, 90px)) * 0.72 - 14px); rotate: 25deg; filter: drop-shadow(0 10px 18px rgba(28, 25, 22, 0.16))">
-<p style="position: relative; z-index: 2; margin: calc(max(5.053cqw, 22px) * -1.275) 0 0 0; padding: 0 0.052em 0 0; font-size: max(5.053cqw, 22px); line-height: 1; font-weight: 400; letter-spacing: -0.052em; text-transform: uppercase">Important thing<br>that turn complexity<br>into value</p>
+<p style="position: relative; z-index: 2; margin: calc(max(5.053cqw, 22px) * -1.275) 0 0 0; padding: 0 0.052em 0 0; font-size: max(5.053cqw, 22px); line-height: 1; font-weight: 400; letter-spacing: -0.052em; text-transform: uppercase" class="hero-sub">Important thing<br>that turn complexity<br>into value</p>
+</div>
 </section>
 
 <section>
-<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: clamp(12px, 1.058cqw, 16px); margin: max(7.94cqw, 56px) 0 0 0; padding: 0 clamp(16px, 1.587cqw, 24px)">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: clamp(12px, 1.058cqw, 16px); margin: max(7.94cqw, 56px) 0 0 0; margin-top: max(min(7.94cqw, 6svh), 56px); padding: 0 clamp(16px, 1.587cqw, 24px)">
 
-<figure id="showreel" style="position: relative; flex: 718 1 max(47.2cqw, 560px); min-width: 0; aspect-ratio: 1600 / 1200; margin: 0; overflow: hidden; background: #e5866e">
+<figure id="showreel" data-cursor="Play" style="position: relative; flex: 718 1 max(47.2cqw, 560px); min-width: 0; aspect-ratio: 1600 / 1200; margin: 0; overflow: hidden; background: #e5866e">
 <figcaption style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Showreel</figcaption>
-<video id="showreel-video" src="assets/showreel.mp4" poster="assets/showreel-poster.jpg" muted="" loop="" playsinline="" preload="metadata" aria-label="Showreel: Design before AI era, portfolio of work 2019–2024" style="display: block; width: 100%; height: 100%; object-fit: cover; cursor: pointer"></video>
+<video id="showreel-video" src="assets/showreel.mp4" poster="assets/showreel-poster.jpg" muted="" playsinline="" preload="metadata" aria-label="Showreel: Design before AI era, portfolio of work 2019–2024" style="display: block; width: 100%; height: 100%; object-fit: cover; cursor: pointer"></video>
 <button type="button" id="showreel-toggle" data-state="paused" aria-label="Play showreel" style="position: absolute; right: clamp(12px, 1.058cqw, 16px); bottom: clamp(12px, 1.058cqw, 16px); width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: rgba(28, 25, 22, 0.72); color: #ffffff; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"></path></svg><svg class="i-play" viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; margin-left: 2px"><path d="M7 4l13 8-13 8z" fill="currentColor"></path></svg></button>
 </figure>
 
 <div style="flex: 730 1 max(48.2cqw, 572px); min-width: 0; display: flex; flex-wrap: wrap; align-items: flex-start; gap: clamp(12px, 1.058cqw, 16px)">
 
 <article style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column">
-<button type="button" id="card-event" aria-haspopup="dialog" data-open="event" style="display: flex; flex-direction: column; width: 100%; margin: 0; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer">
+<button type="button" id="card-event" data-cursor="Open case" aria-haspopup="dialog" data-open="event" style="display: flex; flex-direction: column; width: 100%; margin: 0; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer">
 <img src="assets/work-fintech.jpg" alt="Fintech case study: two phone screens of a money transfer flow, amount entry and recipient list" style="display: block; width: 100%; aspect-ratio: 357 / 265; object-fit: cover">
 <span style="display: block; margin: clamp(8px, 0.794cqw, 12px) 0 0 0; font-size: clamp(18px, 1.653cqw, 25px); line-height: 1.2; font-weight: 400; letter-spacing: -0.01em; text-transform: uppercase; color: #333333"><span style="display: block; color: rgb(229, 134, 110)">APP FINTECH</span><span style="display: block">Unlimit CROSS BOARDER BANKING - PAYMENT CASE</span></span>
 <span style="display: block; margin: 7px 0 0 0; font-size: clamp(14px, 0.992cqw, 15px); line-height: 1.45; font-weight: 400; color: #555555">2024-2025</span>
@@ -66,7 +149,7 @@ body{margin:0}
 </article>
 
 <article style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column">
-<button type="button" id="card-shopping" aria-haspopup="dialog" data-open="shopping" style="display: flex; flex-direction: column; width: 100%; margin: 0; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer">
+<button type="button" id="card-shopping" data-cursor="Open case" aria-haspopup="dialog" data-open="shopping" style="display: flex; flex-direction: column; width: 100%; margin: 0; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer">
 <img src="assets/work-payment-system.webp" alt="Payment system case: Sales screen with invoices by status, under a frosted Payment System cover" style="display: block; width: 100%; aspect-ratio: 357 / 265; object-fit: cover">
 <span style="display: block; margin: clamp(8px, 0.794cqw, 12px) 0 0 0; font-size: clamp(18px, 1.653cqw, 25px); line-height: 1.2; font-weight: 400; letter-spacing: -0.01em; text-transform: uppercase; color: #333333"><span style="display: block"><span style="font-size: clamp(18px, 1.653cqw, 25px); letter-spacing: -0.01em; background-color: initial; font-family: inherit; font-style: inherit; font-variant-ligatures: inherit; font-variant-caps: inherit"><font color="#e5866e">Payment system<br></font></span><span style="color: rgb(51, 51, 51); font-size: clamp(18px, 1.653cqw, 25px); letter-spacing: -0.01em; background-color: initial; font-family: inherit; font-style: inherit; font-variant-ligatures: inherit; font-variant-caps: inherit">DEMO MODE FOR STARTUP PRESALE</span></span></span>
 <span style="display: block; margin: 7px 0 0 0; font-size: clamp(14px, 0.992cqw, 15px); line-height: 1.45; font-weight: 400; color: #555555">2023-2024</span>
@@ -78,36 +161,43 @@ body{margin:0}
 </section>
 
 <section style="display: flex; flex-wrap: wrap; column-gap: 0; row-gap: clamp(16px, 1.6cqw, 24px); margin: max(7.94cqw, 56px) 0 0 0; padding: 0 clamp(16px, 1.587cqw, 24px) clamp(56px, 7.47cqw, 113px) clamp(16px, 1.587cqw, 24px); text-align: left">
-<h2 style="flex: 0 0 max(22.88cqw, 200px); margin: 0; font-size: clamp(20px, 2.646cqw, 40px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; color: #1c1916">Experience</h2>
-<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: clamp(40px, 4.76cqw, 72px)">
+<h2 class="exp-title" style="flex: 0 0 max(22.88cqw, 200px); margin: 0; font-size: clamp(20px, 2.646cqw, 40px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; color: #1c1916">Experience</h2>
+<div class="exp-list" data-kw="4" style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: clamp(40px, 4.76cqw, 72px)">
 
 <article>
-<h3 style="margin: 0; font-size: clamp(20px, 2.646cqw, 40px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; font-variant-numeric: tabular-nums; color: #1c1916">2025–now</h3>
-<p style="margin: clamp(10px, 1.19cqw, 18px) 0 0 0; font-size: clamp(15px, 1.653cqw, 25px); line-height: 1.72; font-weight: 400; letter-spacing: -0.01em; color: #444444">AI changed the way I work as a Product Designer, and I am still rebuilding my process around it. I use AI for early UI, analytics, hypothesis testing and validation, so I can spend more time on user behaviour, business questions and making the product actually work. My current projects are under NDA and cannot be shared publicly yet.</p>
+<h3 style="margin: 0; font-size: clamp(18px, 2.12cqw, 32px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; font-variant-numeric: tabular-nums; color: #1c1916">2025–now</h3>
+<p style="margin: clamp(10px, 1.19cqw, 18px) 0 0 0; font-size: clamp(15px, 1.32cqw, 20px); line-height: 1.65; font-weight: 400; letter-spacing: -0.01em; color: #444444">I work as an <strong class="kw">AI Product Designer</strong>. I take on projects with <strong class="kw">high uncertainty and no brief</strong> — often there is only <strong class="kw">a direction</strong>, and everything else is on me: finding the real problem, the users and the shape of the product. AI runs through my whole process, from early UI to analytics, hypothesis testing and validation, so more of my time goes into user behaviour and business logic. Current projects are under NDA.</p>
 </article>
 
 <article>
-<h3 style="margin: 0; font-size: clamp(20px, 2.646cqw, 40px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; font-variant-numeric: tabular-nums; color: #1c1916">2021–2025</h3>
-<p style="margin: clamp(10px, 1.19cqw, 18px) 0 0 0; font-size: clamp(15px, 1.653cqw, 25px); line-height: 1.72; font-weight: 400; letter-spacing: -0.01em; color: #444444">I worked in fintech products at Elbrus Bootcamp and Sber IT, where there was often very little initial context. I had to figure out a lot myself — understand the real problem, look for new solutions, test different approaches and build the product from there. I worked closely with C-level stakeholders and was involved not only in design, but also in product decisions.</p>
+<h3 style="margin: 0; font-size: clamp(18px, 2.12cqw, 32px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; font-variant-numeric: tabular-nums; color: #1c1916">2021–2025</h3>
+<p style="margin: clamp(10px, 1.19cqw, 18px) 0 0 0; font-size: clamp(15px, 1.32cqw, 20px); line-height: 1.65; font-weight: 400; letter-spacing: -0.01em; color: #444444">Fintech products in <strong class="kw">big tech at Sber IT</strong>, and at Elbrus Bootcamp. Projects rarely came with context: I <strong class="kw">defined the problem myself</strong>, searched for and tested <strong class="kw">new solutions</strong>, and built the product from there. I worked directly with C-level stakeholders and shaped not only the design, but <strong class="kw">product decisions</strong>.</p>
 </article>
 
 <article>
-<h3 style="margin: 0; font-size: clamp(20px, 2.646cqw, 40px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; font-variant-numeric: tabular-nums; color: #1c1916">2016–2021</h3>
-<p style="margin: clamp(10px, 1.19cqw, 18px) 0 0 0; font-size: clamp(15px, 1.653cqw, 25px); line-height: 1.72; font-weight: 400; letter-spacing: -0.01em; color: #444444">During these years I worked on Tele2 products and grew a lot as a Product Designer. I was one of the first two designers in the team, and by the time I left, the design team had grown to 10 people. I worked across different parts of the product, from understanding the problem and discussing it with business and stakeholders to designing complete user flows together with developers. It was a very product-driven environment, where design was closely connected to how the product worked, not only how it looked. My scope and responsibility grew together with the team</p>
+<h3 style="margin: 0; font-size: clamp(18px, 2.12cqw, 32px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; font-variant-numeric: tabular-nums; color: #1c1916">2016–2021</h3>
+<p style="margin: clamp(10px, 1.19cqw, 18px) 0 0 0; font-size: clamp(15px, 1.32cqw, 20px); line-height: 1.65; font-weight: 400; letter-spacing: -0.01em; color: #444444">Tele2 — where I grew as a product designer. I joined as <strong class="kw">one of the first two designers</strong>; by the time I left, the team had grown to <strong class="kw">10 people</strong>. I worked across the product end to end, from framing problems with business and stakeholders to complete user flows built together with developers. A product-driven environment, where design was measured by how the product worked, not only how it looked. My scope grew with the team.</p>
 </article>
 
 <article>
-<h3 style="margin: 0; font-size: clamp(20px, 2.646cqw, 40px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; font-variant-numeric: tabular-nums; color: #1c1916">2014–2016</h3>
-<p style="margin: clamp(10px, 1.19cqw, 18px) 0 0 0; font-size: clamp(15px, 1.653cqw, 25px); line-height: 1.72; font-weight: 400; letter-spacing: -0.01em; color: #444444">My background was in communication design, but I saw more future in digital products and decided to move into Product Design. Before joining a product company, I expanded my role in the fashion business I was working for and took responsibility for everything related to digital design. It was largely a growth direction for the business — digital campaigns, landing pages and other digital touchpoints — and became my transition from communication design into product.</p>
+<h3 style="margin: 0; font-size: clamp(18px, 2.12cqw, 32px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; font-variant-numeric: tabular-nums; color: #1c1916">2014–2016</h3>
+<p style="margin: clamp(10px, 1.19cqw, 18px) 0 0 0; font-size: clamp(15px, 1.32cqw, 20px); line-height: 1.65; font-weight: 400; letter-spacing: -0.01em; color: #444444">I started in communication design, but saw more future in digital products. In the fashion business I worked for, I took on <strong class="kw">everything digital</strong> — campaigns, landing pages and other touchpoints — and it became a growth direction for the company. That was my <strong class="kw">move into product design</strong>.</p>
 </article>
 
 <article>
-<h3 style="margin: 0; font-size: clamp(20px, 2.646cqw, 40px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; font-variant-numeric: tabular-nums; color: #1c1916">Before 2014</h3>
-<p style="margin: clamp(10px, 1.19cqw, 18px) 0 0 0; font-size: clamp(15px, 1.653cqw, 25px); line-height: 1.72; font-weight: 400; letter-spacing: -0.01em; color: #444444">I studied design and worked on my first small projects — competitions and one-off client work. This is where I built my visual and craft foundation.</p>
+<h3 style="margin: 0; font-size: clamp(18px, 2.12cqw, 32px); line-height: 1.25; font-weight: 400; letter-spacing: -0.03em; text-transform: uppercase; font-variant-numeric: tabular-nums; color: #1c1916">Before 2014</h3>
+<p style="margin: clamp(10px, 1.19cqw, 18px) 0 0 0; font-size: clamp(15px, 1.32cqw, 20px); line-height: 1.65; font-weight: 400; letter-spacing: -0.01em; color: #444444">Design studies and first projects — competitions and one-off client work. This is where my <strong class="kw">visual and craft foundation</strong> comes from.</p>
 </article>
 
 </div>
 </section>
+
+<footer class="contact" aria-labelledby="contact-title">
+<h2 id="contact-title" class="contact-big">Bring the|complexity</h2>
+<div class="contact-row">
+<a class="contact-link" href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+</div>
+</footer>
 
 </div>
 <div id="case-event" class="case-overlay" role="dialog" aria-modal="true" aria-labelledby="case-title-event" hidden style="position: fixed; inset: 0px; z-index: 100; overflow-y: auto; overscroll-behavior: contain; background: #ffffff; color: #1c1916; font-family: 'Sora', sans-serif">
@@ -138,7 +228,7 @@ body{margin:0}
 <p style="margin: 0; font-size: clamp(15px, 1.058cqw, 16px); line-height: 1.6; color: #444444">I chose a longer step-by-step flow instead of one large form to reduce cognitive load.</p>
 </section>
 <section style="display: flex; flex-direction: column; gap: 10px"><h3 style="margin: 0; font-size: 12px; line-height: 1.2; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; color: #e5866e">Outcome</h3>
-<ul style="margin: 0; padding: 0 0 0 1.15em; display: flex; flex-direction: column; gap: 4px; font-size: clamp(15px, 1.058cqw, 16px); line-height: 1.6; color: #444444"><li>95% task completion in pre-launch UX testing, n=15;</li><li>44 sec on the first attempt without training;</li><li>30 sec on repeat attempts;</li><li>a scalable flow that can adapt to new jurisdictions.</li></ul>
+<ul style="margin: 0; padding: 0 0 0 1.15em; display: flex; flex-direction: column; gap: 4px; font-size: clamp(15px, 1.058cqw, 16px); line-height: 1.6; color: #444444"><li><span class="num" data-count="95" data-suffix="%">95%</span> task completion in pre-launch UX testing, n=15;</li><li><span class="num" data-count="44" data-suffix=" sec">44 sec</span> on the first attempt without training;</li><li><span class="num" data-count="30" data-suffix=" sec">30 sec</span> on repeat attempts;</li><li>a scalable flow that can adapt to new jurisdictions.</li></ul>
 </section>
 </div>
 </div>
@@ -221,7 +311,26 @@ body{margin:0}
 <script>
 (function () {
   var current = null, lastCard = null;
+  var reduceVT = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function vtName(el, n) { if (el) el.style.viewTransitionName = n || ''; }
+  function visible(el) { if (!el) return null; var r = el.getBoundingClientRect(); return (r.bottom > 0 && r.top < innerHeight) ? el : null; }
+  function cardMedia(id) { var c = document.getElementById('card-' + id); return c ? c.querySelector('img') : null; }
+  function caseMedia(id) { var o = document.getElementById('case-' + id); return o ? o.querySelector('.case-first img') : null; }
   function show(id) {
+    if (!document.startViewTransition || reduceVT) { showNow(id); return; }
+    var from = current ? current.id.replace('case-', '') : null, a = null, b = null;
+    if (id && !from) { a = cardMedia(id); b = caseMedia(id); }
+    else if (!id && from) { a = visible(caseMedia(from)); b = a ? cardMedia(from) : null; }
+    var go = function () {
+      vtName(a, 'case-media');
+      var t = document.startViewTransition(function () { vtName(a); showNow(id); vtName(b, 'case-media'); });
+      t.finished.finally(function () { vtName(b); });
+    };
+    var img = id && !from ? b : null;
+    if (img && img.decode) Promise.race([img.decode().catch(function () {}), new Promise(function (r) { setTimeout(r, 450); })]).then(go); else go();
+  }
+  setTimeout(function () { ['event', 'shopping'].forEach(function (k) { var m = caseMedia(k); if (m && m.decode) m.decode().catch(function () {}); }); }, 2500);
+  function showNow(id) {
     if (current) current.hidden = true;
     current = id ? document.getElementById('case-' + id) : null;
     if (current) {
@@ -342,39 +451,44 @@ function crumble() {
           if (Math.abs(ux) > iw / 2 + s / 2 || Math.abs(uy) > ih / 2 + s / 2) continue;
         }
         var x0 = ax + col * s, y0 = ay + row * s;
-        var land = fx0 + Math.random() * (fx1 - fx0);
-        var tx = x0 + (land - x0) * (0.55 + Math.random() * 0.4);
-        var ty = floorTop - top + Math.random() * 22;
-        var delay = (row / rows) * 0.6 + Math.random() * 0.35 + k * 0.18;
-        var dur = 0.95 + Math.random() * 0.55 + Math.abs(tx - x0) / 1400;
-        maxEnd = Math.max(maxEnd, delay + dur);
+        var delay = (1 - row / rows) * 0.45 + Math.random() * 0.3 + k * 0.16;
         parts.push({ c: off, sx: col * s * dpr, sy: row * s * dpr, sw: cw * dpr, sh: ch * dpr, w: cw, h: ch,
-          x0: x0, y0: y0, tx: tx, ty: ty, delay: delay, dur: dur, ph: Math.random() * 6.28, amp: 6 + Math.random() * 14 });
+          x: x0, y: y0, vx: (Math.random() - 0.5) * 24, vy: Math.random() * 40, delay: delay,
+          e: 0.32 + Math.random() * 0.22, floor: floorTop - top - ch, state: 0, rest: 0, a: 1 });
       }
     }
   });
-  var t0 = performance.now(), hidden = false;
+  /* simple physics: gravity -> hit the top edge of the next row -> 1-2 bounces -> settle -> dissolve */
+  var G = 2600, t0 = performance.now(), last = t0, hidden = false;
   function frame(now) {
     if (done) return;
-    var t = (now - t0) / 1000;
+    var t = (now - t0) / 1000, dt = Math.min(0.033, (now - last) / 1000); last = now;
     ctx.clearRect(0, 0, W, H);
+    var alive = 0;
     for (var i = 0; i < parts.length; i++) {
-      var p = parts[i], q = (t - p.delay) / p.dur;
-      if (q >= 1) continue;
-      var x = p.x0, y = p.y0, sc = 1, a = 1;
-      if (q > 0) {
-        var e = 0.5 - Math.cos(q * Math.PI) / 2;
-        x = p.x0 + (p.tx - p.x0) * e + Math.sin(q * 6.28 + p.ph) * p.amp * (1 - q);
-        y = p.y0 + (p.ty - p.y0) * q * q;
-        sc = 1 - 0.45 * q;
-        a = q > 0.82 ? Math.max(0, (1 - q) / 0.18) : 1;
+      var p = parts[i];
+      if (p.a <= 0) continue;
+      alive++;
+      if (t > p.delay) {
+        if (p.state < 2) {
+          p.vy += G * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+          if (p.y >= p.floor) {
+            p.y = p.floor;
+            if (p.vy > 140) { p.vy = -p.vy * p.e; p.vx += (Math.random() - 0.5) * 150; p.state = 1; }
+            else { p.vy = 0; p.state = 2; p.rest = t + 0.15 + Math.random() * 0.5; }
+          }
+        } else {
+          p.vx *= Math.pow(0.02, dt); p.x += p.vx * dt;
+          if (t > p.rest) p.a -= dt / 0.55;
+        }
+        if (p.x < 0) { p.x = 0; p.vx = -p.vx * 0.4; } else if (p.x > W - p.w) { p.x = W - p.w; p.vx = -p.vx * 0.4; }
       }
-      ctx.globalAlpha = a;
-      ctx.drawImage(p.c, p.sx, p.sy, p.sw, p.sh, x, y, p.w * sc, p.h * sc);
+      ctx.globalAlpha = Math.max(0, p.a);
+      ctx.drawImage(p.c, p.sx, p.sy, p.sw, p.sh, p.x, p.y, p.w, p.h);
     }
     ctx.globalAlpha = 1;
     if (!hidden) { hidden = true; arts.forEach(function (img) { hide(img, 1); }); }
-    if (t < maxEnd + 0.05) raf = requestAnimationFrame(frame);
+    if (alive) raf = requestAnimationFrame(frame);
     else cleanup();
   }
   raf = requestAnimationFrame(frame);
@@ -386,30 +500,31 @@ return cleanup;
 var v = document.getElementById('showreel-video'), btn = document.getElementById('showreel-toggle');
 if (!v || !btn) return function () {};
 var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-var userPaused = reduce, inView = false;
-v.muted = true; v.defaultMuted = true; v.playsInline = true; v.loop = true;
+var userPaused = reduce, inView = false, finished = false;
+v.muted = true; v.defaultMuted = true; v.playsInline = true; v.loop = false;
 function sync() {
   btn.setAttribute('data-state', v.paused ? 'paused' : 'playing');
   btn.setAttribute('aria-label', v.paused ? 'Play showreel' : 'Pause showreel');
 }
 function tryPlay() {
-  if (userPaused || !inView) return;
+  if (userPaused || finished || !inView) return;
   var p = v.play();
   if (p && p.catch) p.catch(function () { sync(); });
 }
 function toggle(e) {
   if (e) e.stopPropagation();
-  if (v.paused) { userPaused = false; inView = true; tryPlay(); }
+  if (v.paused) { userPaused = false; finished = false; inView = true; tryPlay(); }
   else { userPaused = true; v.pause(); }
 }
 v.addEventListener('play', sync); v.addEventListener('pause', sync);
+v.addEventListener('ended', function () { finished = true; v.load(); sync(); });
 btn.addEventListener('click', toggle); v.addEventListener('click', toggle);
 var io = null;
 if ('IntersectionObserver' in window) {
   io = new IntersectionObserver(function (entries) {
     inView = entries[0].isIntersecting;
     if (inView) tryPlay(); else if (!v.paused) v.pause();
-  }, { threshold: 0.25 });
+  }, { threshold: 0.6 });
   io.observe(v);
 } else { inView = true; tryPlay(); }
 sync();
@@ -420,6 +535,222 @@ return function () {
   try { v.pause(); } catch (e) {}
 };
 
+})();
+</script>
+
+<script>
+document.documentElement.classList.add('js');
+(function () {
+  var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  /* --- O window: works cycle inside the O of SOLVING --- */
+  var pane = document.querySelector('.o-win__pane');
+  if (pane) {
+    var imgs = [].slice.call(pane.querySelectorAll('img')), i = -1, vis = true;
+    var tick = function () { if (!vis) return; if (i >= 0) imgs[i].classList.remove('is-on'); i = (i + 1) % imgs.length; imgs[i].classList.add('is-on'); };
+    if (reduce) { imgs[0].classList.add('is-on'); }
+    else {
+      var started = false, go = function () { if (started) return; started = true; tick(); setInterval(tick, 650); };
+      document.addEventListener('hero:typed', go);
+      setTimeout(go, 9000); /* safety net if typing never finishes */
+      if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { vis = e[0].isIntersecting; }).observe(pane);
+    }
+  }
+
+  /* --- Typewriter subtitle on load --- */
+  var sub = document.querySelector('.hero-sub');
+  if (!sub || reduce) document.dispatchEvent(new Event('hero:typed'));
+  else {
+    var orig = sub.innerHTML, steps = [], words = [];
+    [].slice.call(sub.childNodes).forEach(function (n) {
+      if (n.nodeType === 3) {
+        words.push(n.textContent);
+        var frag = document.createDocumentFragment();
+        n.textContent.split('').forEach(function (ch) {
+          var sp = document.createElement('span'); sp.className = 'tw'; sp.setAttribute('aria-hidden', 'true'); sp.textContent = ch;
+          frag.appendChild(sp); steps.push(sp);
+        });
+        sub.replaceChild(frag, n);
+      } else if (n.nodeName === 'BR') steps.push(n);
+    });
+    var sr = document.createElement('span'); sr.className = 'sr-only'; sr.textContent = words.join(' '); sub.prepend(sr);
+    var caret = document.createElement('span'); caret.className = 'tw-caret'; caret.setAttribute('aria-hidden', 'true');
+    sub.classList.add('is-typing'); sr.after(caret);
+    var k = 0;
+    var type = function () {
+      if (k >= steps.length) {
+        caret.classList.add('is-idle');
+        setTimeout(function () { sub.classList.remove('is-typing'); sub.innerHTML = orig; document.dispatchEvent(new Event('hero:typed')); }, 800);
+        return;
+      }
+      var n = steps[k++];
+      n.after(caret);
+      if (n.nodeName === 'BR') { setTimeout(type, 280); return; }
+      n.classList.add('on');
+      setTimeout(type, (n.textContent === ' ' ? 55 : 24) + Math.random() * 36);
+    };
+    var startType = function () { setTimeout(type, 600); };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(startType); else startType();
+  }
+
+  /* --- Cursor label --- */
+  if (window.matchMedia && matchMedia('(hover:hover) and (pointer:fine)').matches) {
+    var c = document.createElement('div'); c.className = 'cur'; c.setAttribute('aria-hidden', 'true'); document.body.appendChild(c);
+    var tx = 0, ty = 0, x = 0, y = 0, target = null, raf = 0;
+    var label = function (el) {
+      if (el.id === 'showreel') { var v = document.getElementById('showreel-video'); return v && !v.paused ? 'Pause' : 'Play'; }
+      return el.getAttribute('data-cursor');
+    };
+    var loop = function () { x += (tx - x) * 0.28; y += (ty - y) * 0.28; c.style.left = x + 'px'; c.style.top = y + 'px';
+      raf = (Math.abs(tx - x) + Math.abs(ty - y) > 0.3) ? requestAnimationFrame(loop) : 0; };
+    document.addEventListener('pointermove', function (e) {
+      tx = e.clientX; ty = e.clientY; if (!target) { x = tx; y = ty; }
+      target = e.target.closest ? e.target.closest('[data-cursor]') : null;
+      if (target) { c.textContent = label(target); c.classList.add('is-on'); } else { c.classList.remove('is-on'); }
+      if (!raf) raf = requestAnimationFrame(loop);
+    }, { passive: true });
+    var recheck = function () {
+      if (!tx && !ty) return;
+      var el = document.elementFromPoint(tx, ty); target = el && el.closest ? el.closest('[data-cursor]') : null;
+      if (target) { c.textContent = label(target); c.classList.add('is-on'); } else c.classList.remove('is-on');
+    };
+    var st = 0; addEventListener('scroll', function () { cancelAnimationFrame(st); st = requestAnimationFrame(recheck); }, { passive: true, capture: true });
+    document.addEventListener('pointerover', function (e) { tx = e.clientX; ty = e.clientY; recheck(); if (!raf) raf = requestAnimationFrame(loop); });
+    document.documentElement.addEventListener('pointerleave', function () { c.classList.remove('is-on'); target = null; });
+    document.addEventListener('click', function () { setTimeout(function () {
+      var el = document.elementFromPoint(tx, ty); target = el && el.closest ? el.closest('[data-cursor]') : null;
+      if (target) c.textContent = label(target); else c.classList.remove('is-on'); }, 120); });
+  }
+
+  /* --- Experience: timeline + date parallax (rAF loop, independent of which element scrolls) --- */
+  var list = document.querySelector('.exp-list');
+  if (list) {
+    var fill = document.createElement('span'); fill.className = 'exp-fill'; fill.setAttribute('aria-hidden', 'true'); list.prepend(fill);
+    var arts = [].slice.call(list.querySelectorAll(':scope > article'));
+    var cur = arts.map(function () { return [0, 0]; }), running = false, inView = true, kwBlock = 0;
+    var ease = function (q) { return 1 - Math.pow(1 - q, 3); };
+    var frame = function () {
+      var vh = innerHeight, mid = vh * 0.55, r = list.getBoundingClientRect(), settled = true;
+      fill.style.setProperty('--p', Math.max(0, Math.min(1, (mid - r.top) / r.height)).toFixed(4));
+      var wide = getComputedStyle(arts[0]).display === 'grid';
+      var dMax = wide ? 110 : 20, tMax = wide ? 40 : 50;   /* date / text travel, px */
+      arts.forEach(function (a, k) {
+        var ar = a.getBoundingClientRect();
+        a.classList.toggle('is-past', ar.top < mid);
+        /* entrance only: block enters at 95% of the viewport and locks aligned by 60% */
+        var q = reduce ? 1 : Math.max(0, Math.min(1, (vh * 0.95 - ar.top) / (vh * 0.35))), rest = 1 - ease(q);
+        var to = [rest * dMax, rest * tMax];
+        for (var j = 0; j < 2; j++) {
+          cur[k][j] += (to[j] - cur[k][j]) * 0.18;
+          if (Math.abs(to[j] - cur[k][j]) > 0.2) settled = false; else cur[k][j] = to[j];
+        }
+        if (rest < 0.01 && !a.classList.contains('kw-on') && performance.now() > kwBlock) kwOn(a);
+        [].forEach.call(a.children, function (el, idx) {
+          var v = idx === 0 ? cur[k][0] : cur[k][1];
+          el.style.transform = v ? 'translate3d(0,' + v.toFixed(2) + 'px,0)' : '';
+        });
+      });
+      running = inView || !settled;
+      if (running) requestAnimationFrame(frame);
+    };
+    var kick = function () { if (!running) { running = true; requestAnimationFrame(frame); } };
+    var kwOn = function (a) {
+      var kws = a.querySelectorAll('.kw');
+      [].forEach.call(kws, function (k, i) { k.style.setProperty('--kd', (0.12 + i * 0.16) + 's'); });
+      a.classList.add('kw-on');
+    };
+    window.__kwReplay = function () {
+      list.classList.add('kw-reset'); arts.forEach(function (a) { a.classList.remove('kw-on'); });
+      void list.offsetWidth; kwBlock = performance.now() + 120;
+      setTimeout(function () { list.classList.remove('kw-reset'); inView = true; kick(); }, 80);
+    };
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { inView = e[0].isIntersecting; if (inView) kick(); }, { rootMargin: '200px 0px' }).observe(list);
+    addEventListener('scroll', kick, { passive: true, capture: true }); addEventListener('resize', kick);
+    kick();
+  }
+
+  /* --- Outcome count-up --- */
+  var nums = document.querySelectorAll('[data-count]');
+  if (nums.length && !reduce && 'IntersectionObserver' in window) {
+    var run = function (el) {
+      var to = +el.dataset.count, suf = el.dataset.suffix || '', t0 = performance.now(), d = 1100;
+      (function f(now) { var q = Math.min(1, (now - t0) / d), e = 1 - Math.pow(1 - q, 3);
+        el.textContent = Math.round(to * e) + suf; if (q < 1) requestAnimationFrame(f); })(t0);
+    };
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); run(e.target); } }); }, { threshold: 0.6 });
+    [].forEach.call(nums, function (el) { io.observe(el); });
+  }
+
+  /* --- Contact: letter reveal + copy email --- */
+  var big = document.querySelector('.contact-big');
+  if (big) {
+    var txt = big.textContent; big.setAttribute('aria-label', txt.replace('|', ' ')); big.textContent = '';
+    txt.split('').forEach(function (ch, k) {
+      if (ch === '|') { big.appendChild(document.createElement('br')); return; }
+      var o = document.createElement('span'); o.className = 'ch'; o.setAttribute('aria-hidden', 'true');
+      var s = document.createElement('span'); s.textContent = ch === ' ' ? '\u00a0' : ch; s.style.setProperty('--d', (k * 0.035) + 's');
+      o.appendChild(s); big.appendChild(o);
+    });
+    if ('IntersectionObserver' in window) {
+      var bio = new IntersectionObserver(function (e) { if (e[0].isIntersecting) { big.classList.add('is-in'); bio.disconnect(); setTimeout(function () { startSwing(); }, 1500); } }, { threshold: 0.4 });
+      bio.observe(big);
+    } else big.classList.add('is-in');
+  }
+  /* --- Footer: letters hang on hinges and swing when the cursor brushes past --- */
+  var startSwing = function () {};
+  if (big && !reduce) {
+    var sch = [].slice.call(big.querySelectorAll('.ch')).filter(function (c) { return c.textContent.trim(); });
+    var sst = sch.map(function (c) { c.style.transformOrigin = '50% 0'; return { a: 0, w: 0 }; });
+    var scen = [], sraf = 0, sLast = 0, sOn = false, lastP = null;
+    var measure = function () {
+      var r = big.getBoundingClientRect();
+      scen = sch.map(function (c) { return { x: r.left + scrollX + c.offsetLeft + c.offsetWidth / 2, y: r.top + scrollY + c.offsetTop + c.offsetHeight / 2, w: c.offsetWidth, h: c.offsetHeight }; });
+    };
+    var step = function (now) {
+      var dt = Math.min(0.033, (now - sLast) / 1000), moving = false; sLast = now;
+      sst.forEach(function (s, i) {
+        s.w += -s.a * 60 * dt; s.w *= Math.pow(0.12, dt); s.a += s.w * dt;
+        if (s.a > 0.6) { s.a = 0.6; s.w *= -0.3; } else if (s.a < -0.6) { s.a = -0.6; s.w *= -0.3; }
+        if (Math.abs(s.a) > 0.0015 || Math.abs(s.w) > 0.01) moving = true; else { s.a = 0; s.w = 0; }
+        sch[i].style.transform = s.a ? 'rotate(' + s.a.toFixed(4) + 'rad)' : '';
+      });
+      sraf = moving ? requestAnimationFrame(step) : 0;
+    };
+    var kickS = function () { if (!sraf) { sLast = performance.now(); sraf = requestAnimationFrame(step); } };
+    var push = function (x, y, vx) {
+      var hit = false;
+      scen.forEach(function (c, i) {
+        if (Math.abs(x - c.x) < c.w * 0.6 + 6 && Math.abs(y - c.y) < c.h * 0.6) { sst[i].w += vx * 0.03; hit = true; }
+      });
+      if (hit) kickS();
+    };
+    document.addEventListener('pointermove', function (e) {
+      if (!sOn) return;
+      var x = e.clientX + scrollX, y = e.clientY + scrollY;
+      if (lastP) push(x, y, Math.max(-60, Math.min(60, x - lastP.x)));
+      lastP = { x: x, y: y };
+    }, { passive: true });
+    big.addEventListener('pointerdown', function (e) {
+      if (!sOn) return;
+      var x = e.clientX + scrollX, y = e.clientY + scrollY;
+      scen.forEach(function (c, i) { var d = x - c.x; if (Math.abs(d) < c.w * 3) sst[i].w += (d < 0 ? 1 : -1) * 2.2 * (1 - Math.abs(d) / (c.w * 3)); });
+      kickS();
+    });
+    addEventListener('resize', function () { if (sOn) measure(); });
+    startSwing = function () {
+      if (sOn) return; sOn = true; measure();
+      sst.forEach(function (s, i) { setTimeout(function () { s.w += (i % 2 ? 1 : -1) * (0.9 + Math.random() * 0.8); kickS(); }, i * 45); });
+    };
+  }
+
+  var toast = document.querySelector('.contact-toast'), tt = 0;
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-copy]'); if (!b) return;
+    var v = b.getAttribute('data-copy');
+    var ok = function () { if (!toast) return; toast.textContent = 'Email copied'; toast.classList.add('is-on'); clearTimeout(tt); tt = setTimeout(function () { toast.classList.remove('is-on'); }, 1800); };
+    var mail = function () { location.href = 'mailto:' + v; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(v).then(ok, mail); else mail();
+  });
 })();
 </script>
 </body>
